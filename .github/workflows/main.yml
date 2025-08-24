@@ -5,8 +5,11 @@ name: main
 jobs:
   linux-musl-arm64:
     name: linux musl arm64
-#    container:
-#      image: alpine:3.18
+    container:
+      image: alpine
+      volumes:
+        - /opt:/opt:rw,rshared
+        - /opt:/__e/node20:ro,rshared
     runs-on: ubuntu-24.04-arm
     strategy:
       fail-fast: false
@@ -15,7 +18,12 @@ jobs:
         quantum: [ Q8 ]
 
     steps:
-
+    - name: Allow Linux musl containers on ARM64 runners
+      run: |
+        sed -i "/^ID=/s/alpine/NotpineForGHA/" /etc/os-release
+        apk add nodejs --update-cache
+        mkdir /opt/bin
+        ln -s /usr/bin/node /opt/bin/node
     - name: Checkout
       uses: actions/checkout@v5
 
