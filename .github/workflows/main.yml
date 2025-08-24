@@ -4,20 +4,15 @@ on:
 name: main
 jobs:
   linux-musl-arm64:
-    name: linux musl ${{matrix.quantum}}${{matrix.openmp_flag}} (${{matrix.architecture}})
+    name: linux musl arm64
 #    container:
 #      image: alpine:3.18
     runs-on: ubuntu-24.04-arm
-
     strategy:
       fail-fast: false
       matrix:
         architecture: [ arm64 ]
         quantum: [ Q8 ]
-        openmp: [ noOpenMP ]
-        include:
-          - openmp: OpenMP
-            openmp_flag: -OpenMP
 
     steps:
 
@@ -25,11 +20,11 @@ jobs:
       uses: actions/checkout@v5
 
     - name: Install build tools
-      run: ./install.build-tools.sh
+      run: chmod a+x ./install.build-tools.sh&&./install.build-tools.sh
       working-directory: build/linux-musl-${{matrix.architecture}}
 
     - name: Update ImageMagick.commit to latest commit
-      run: ./update.imagemagick.sh
+      run: chmod a+x ./update.imagemagick.sh&&./update.imagemagick.sh
       if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
       working-directory: src/ImageMagick
 
@@ -38,21 +33,21 @@ jobs:
       working-directory: src/ImageMagick
 
     - name: Build ImageMagick
-      run: ../../../build/shared/build.imagemagick.sh linux-musl ${{matrix.architecture}} ${{matrix.quantum}} ${{matrix.openmp}}
+      run: ../../../build/shared/build.imagemagick.sh linux-musl ${{matrix.architecture}} ${{matrix.quantum}}
       working-directory: src/ImageMagick/ImageMagick
 
     - name: Build Native
-      run: ../../build/shared/build.native.sh linux-musl ${{matrix.architecture}} ${{matrix.quantum}} ${{matrix.openmp}}
+      run: ../../build/shared/build.native.sh linux-musl ${{matrix.architecture}} ${{matrix.quantum}}
       working-directory: src/Magick.Native
 
     - name: Copy Native
-      run: ../../build/shared/copy.native.sh ../../artifacts linux-musl ${{matrix.architecture}} ${{matrix.quantum}} ${{matrix.openmp}}
+      run: ../../build/shared/copy.native.sh ../../artifacts linux-musl ${{matrix.architecture}} ${{matrix.quantum}}
       working-directory: src/Magick.Native
 
     - name: Upload library
       uses: actions/upload-artifact@v4
       with:
-        name: linux-musl-${{matrix.quantum}}-${{matrix.architecture}}-${{matrix.openmp}}
+        name: linux-musl-${{matrix.quantum}}-${{matrix.architecture}}-NoOpenMP
         path: artifacts
 
   metadata:
