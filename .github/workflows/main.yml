@@ -5,8 +5,8 @@ name: main
 jobs:
   linux-musl-arm64:
     name: linux musl ${{matrix.quantum}}${{matrix.openmp_flag}} (${{matrix.architecture}})
-    container:
-      image: alpine:3.18
+#    container:
+#      image: alpine:3.18
     runs-on: ubuntu-24.04-arm
 
     strategy:
@@ -59,7 +59,7 @@ jobs:
     name: Metadata
     needs:
       - linux-musl-arm64
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04-arm
     outputs:
       version: ${{steps.set-version.outputs.version}}
 
